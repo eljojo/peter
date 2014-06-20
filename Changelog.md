@@ -6,6 +6,7 @@
  * Using GraphicsMagick instead of ImageMagick (lightweight alternative)
  * Installing wget and curl
  * Added github ssh public key to /home/app/.ssh/known_hosts
+ * Added LC_ALL=en_US.UTF-8 and RAILS_ENV=production as ENV variables
 
 ## 0.9.10 (release date: 2014-06-20)
 
