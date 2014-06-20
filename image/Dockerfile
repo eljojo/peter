@@ -9,4 +9,7 @@ RUN mkdir /build
 ADD . /build
 RUN /build/install.sh
 CMD ["/sbin/my_init"]
+
+RUN rm /usr/sbin/enable_insecure_key /etc/insecure_key.pub
+
 EXPOSE 80 443

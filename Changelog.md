@@ -7,6 +7,7 @@
  * Installing wget and curl
  * Added github ssh public key to /home/app/.ssh/known_hosts
  * Added LC_ALL=en_US.UTF-8 and RAILS_ENV=production as ENV variables
+ * Removed ability to add insecure SSH key
 
 ## 0.9.10 (release date: 2014-06-20)
 
