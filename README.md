@@ -340,4 +340,5 @@ If you want to call the resulting image something else, pass the NAME variable, 
 
 Big thanks to the [Phusion](http://www.phusion.nl/) people for creating passenger-docker and baseimage. :-)
 
+![More Peter](http://www.delish.com/cm/delish/images/Pe/peter-griffin-family-guy-del-fictional-foods-xl.jpg)
 
