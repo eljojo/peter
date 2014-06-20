@@ -7,8 +7,8 @@ set -x
 
 ## For nokogiri.
 $minimal_apt_get_install libxml2-dev libxslt1-dev
-## For rmagick and minimagick.
-$minimal_apt_get_install imagemagick libmagickwand-dev
+## For installing graphicsmagick, a lightweight alternative to imagemagick
+$minimal_apt_get_install graphicsmagick-imagemagick-compat
 ## For mysql and mysql2.
 $minimal_apt_get_install libmysqlclient-dev
 ## For sqlite3.
