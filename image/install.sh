@@ -5,7 +5,6 @@ set -x
 
 /build/enable_repos.sh
 /build/prepare.sh
-/build/pups.sh
 /build/utilities.sh
 
 /build/ruby2.1.sh
