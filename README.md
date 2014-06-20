@@ -1,38 +1,39 @@
-# A Docker base image for Ruby, Python, Node.js and Meteor web apps
+# A Docker base image for Ruby (web) apps
 
-<center><img src="http://blog.phusion.nl/wp-content/uploads/2012/07/Passenger_chair_256x256.jpg" width="196" height="196" alt="Phusion Passenger"> <img src="http://blog.phusion.nl/wp-content/uploads/2013/11/docker.png" width="233" height="196" alt="Docker"></center>
+<img src="http://blog.phusion.nl/wp-content/uploads/2013/11/docker.png" width="233" height="196" alt="Docker"></center>
 
-Passenger-docker is a [Docker](http://www.docker.io) image meant to serve as a good base for **Ruby, Python, Node.js and Meteor** web app images. In line with [Phusion Passenger](https://www.phusionpassenger.com/)'s goal, passenger-docker's goal is to make Docker image building for web apps much easier and faster.
+Peter is a [Docker](http://www.docker.io) image meant to serve as a good base for **Ruby** web app images. This image is based on [Phusion's baseimage](https://github.com/phusion/baseimage-docker), and it's actually a modification of [Phusion's Passenger-docker Image](https://github.com/phusion/passenger-docker), but without passenger. It also has some modifications.
 
-Why is this image called "passenger"? It's to represent the ease: you just have to sit back and watch most of the heavy lifting being done for you. Passenger-docker is part of a larger and more ambitious project: to make web app deployment ridiculously simple, to heights never achieved before.
+---------------------------------------
 
-**Relevant links:**
- [Github](https://github.com/phusion/passenger-docker) |
- [Docker registry](https://index.docker.io/u/phusion/passenger-full/) |
- [Discussion forum](https://groups.google.com/d/forum/passenger-docker) |
- [Twitter](https://twitter.com/phusion_nl) |
- [Blog](http://blog.phusion.nl/)
+Differences with passenger-docker:
+
+- Removed Phusion Passenger
+- Removed Python
+- Removed Ruby 1.9 and 2.0 (only 2.1 left)
+- Disabled nginx by default (easy to enable)
+- Disabled cron by default (easy to enable)
+- Removed redis
+- Removed memcached
+- Removed pups
 
 ---------------------------------------
 
 **Table of contents**
 
- * [Why use passenger-docker?](#why_use)
- * [About passenger-docker](#about)
+ * [Why use peter?](#why_use)
+ * [About peter](#about)
    * [What's included?](#whats_included)
    * [Memory efficiency](#memory_efficiency)
-   * [Image variants](#image_variants)
  * [Inspecting the image](#inspecting_the_image)
  * [Using the image as base](#using)
    * [Getting started](#getting_started)
    * [The `app` user](#app_user)
-   * [Using Nginx and Passenger](#nginx_passenger)
+   * [Using Nginx](#nginx)
      * [Adding your web app to the image](#adding_web_app)
      * [Configuring Nginx](#configuring_nginx)
      * [Setting environment variables in Nginx](#nginx_env_vars)
-   * [Using Redis](#redis)
-   * [Using memcached](#memcached)
-   * [Additional daemons](#additional_daemons)
+   * [Adding additional daemons](#adding_additional_daemons)
    * [Selecting a default Ruby version](#selecting_default_ruby)
    * [Running scripts during container startup](#running_startup_scripts)
  * [Administering the image's system](#administering)
@@ -40,7 +41,6 @@ Why is this image called "passenger"? It's to represent the ease: you just have 
      * [Using the insecure key for one container only](#using_the_insecure_key_for_one_container_only)
      * [Enabling the insecure key permanently](#enabling_the_insecure_key_permanently)
      * [Using your own key](#using_your_own_key)
-   * [Inspecting the status of your web app](#inspecting_web_app_status)
    * [Logs](#logs)
  * [Building the image yourself](#building)
  * [Conclusion](#conclusion)
@@ -48,9 +48,9 @@ Why is this image called "passenger"? It's to represent the ease: you just have 
 ---------------------------------------
 
 <a name="why_use"></a>
-## Why use passenger-docker?
+## Why use peter?
 
-Why use passenger-docker instead of doing everything yourself in Dockerfile?
+Why use peter instead of doing everything yourself in Dockerfile?
 
  * Your Dockerfile can be smaller.
  * It reduces the time needed to write a correct Dockerfile. You won't have to worry about the base system and the stack, you can focus on just your app.
@@ -61,10 +61,13 @@ Why use passenger-docker instead of doing everything yourself in Dockerfile?
 <a name="about"></a>
 ## About the image
 
+I really liked passenger-docker, but I'm not a big fan of Passenger and I don't need to deploy python apps.
+This is just a lightweight version of it.
+
 <a name="whats_included"></a>
 ### What's included?
 
-*Passenger-docker is built on top of a solid base: [baseimage-docker](http://phusion.github.io/baseimage-docker/).*
+*Peter is built on top of a solid base: [baseimage-docker](http://phusion.github.io/baseimage-docker/).*
 
 Basics (learn more at [baseimage-docker](http://phusion.github.io/baseimage-docker/)):
 
@@ -72,67 +75,33 @@ Basics (learn more at [baseimage-docker](http://phusion.github.io/baseimage-dock
  * A **correct** init process ([learn more](http://phusion.github.io/baseimage-docker/)).
  * Fixes APT incompatibilities with Docker.
  * syslog-ng.
- * The cron daemon.
+ * The cron daemon (disabled by default)
  * The SSH server, so that you can easily login to your container to inspect or administer things. Password and challenge-response authentication are disabled by default. Only key authentication is allowed.
  * [Runit](http://smarden.org/runit/) for service supervision and management.
 
 Language support:
 
- * Ruby 1.9.3, 2.0.0 and 2.1.0.
-   * 2.1.0 is configured as the default.
+ * Ruby 2.1.0, configured as default.
+   * Planned to include jruby.
    * Ruby is installed through [the Brightbox APT repository](https://launchpad.net/~brightbox/+archive/ruby-ng). We're not using RVM!
- * Python 2.7 and Python 3.0.
  * Node.js 0.10, through [Chris Lea's Node.js PPA](https://launchpad.net/~chris-lea/+archive/node.js/).
- * A build system, git, and development headers for many popular libraries, so that the most popular Ruby, Python and Node.js native extensions can be compiled without problems.
+ * A build system, git, and development headers for many popular libraries, so that the most popular Ruby and Node.js native extensions can be compiled without problems.
 
 Web server and application server:
 
  * Nginx 1.6. Disabled by default.
- * [Phusion Passenger 4](https://www.phusionpassenger.com/). Disabled by default (because it starts along with Nginx).
-   * This is a fast and lightweight tool for simplifying web application integration into Nginx.
-   * It adds many production-grade features, such as process monitoring, administration and status inspection.
-   * It replaces (G)Unicorn, Thin, Puma, uWSGI.
-   * Node.js users: [watch this 4 minute intro video](http://vimeo.com/phusionnl/review/84945384/73fe7432ee) to learn why it's cool and useful.
-
-Auxiliary services and tools:
-
- * Redis 2.6, through [Rowan's Redis PPA](https://launchpad.net/~rwky/+archive/redis). Disabed by default.
- * Memcached. Disabled by default.
- * [Pups](https://github.com/SamSaffron/pups), a lightweight tool for bootstrapping images.
 
 <a name="memory_efficiency"></a>
 ### Memory efficiency
 
-Passenger-docker is very lightweight on memory. In its default configuration, it only uses 10 MB of memory (the memory consumed by bash, runit, sshd, syslog-ng, etc).
-
-<a name="image_variants"></a>
-### Image variants
-
-Passenger-docker consists of several images, each one tailor made for a specific user group.
-
-**Ruby images**
-
- * `phusion/passenger-ruby19` - Ruby 1.9.
- * `phusion/passenger-ruby20` - Ruby 2.0.
- * `phusion/passenger-ruby21` - Ruby 2.1.
-
-**Node.js and Meteor images**
-
- * `phusion/passenger-nodejs` - Node.js 0.11.
-
-**Other images**
-
- * `phusion/passenger-full` - Contains everything in the above images. Ruby, Python, Node.js, all in a single image for your convenience.
- * `phusion/passenger-customizable` - Contains only the base system, as described in "What's included?". Ruby, Python and Node.js are not preinstalled. This image is meant to be further customized through your Dockerfile. For example, using this image you can create a custom image that contains only Ruby 2.0, Ruby 2.1 and Node.js.
-
-In the rest of this document we're going to assume that the reader will be using `phusion/passenger-full`, unless otherwise stated. Simply substitute the name if you wish to use another image.
+Peter is very lightweight on memory. In its default configuration, it only uses 10 MB of memory (the memory consumed by bash, runit, sshd, syslog-ng, etc).
 
 <a name="inspecting_the_image"></a>
 ## Inspecting the image
 
 To look around in the image, run:
 
-    docker run -rm -t -i phusion/passenger-full bash -l
+    docker run -rm -t -i eljojo/peter bash -l
 
 You don't have to download anything manually. The above command will automatically pull the passenger-docker image from the Docker registry.
 
@@ -142,44 +111,17 @@ You don't have to download anything manually. The above command will automatical
 <a name="getting_started"></a>
 ### Getting started
 
-There are several images, e.g. `phusion/passenger-ruby21` and `phusion/passenger-nodejs`. Choose the one you want. See [Image variants](#image_variants).
+Put the following in your Dockerfile:
 
-So put the following in your Dockerfile:
-
-    # Use phusion/passenger-full as base image. To make your builds reproducible, make
+    # To make your builds reproducible, make
     # sure you lock down to a specific version, not to `latest`!
-    # See https://github.com/phusion/passenger-docker/blob/master/Changelog.md for
-    # a list of version numbers.
-    FROM phusion/passenger-full:<VERSION>
-    # Or, instead of the 'full' variant, use one of these:
-    #FROM phusion/passenger-ruby19:<VERSION>
-    #FROM phusion/passenger-ruby20:<VERSION>
-    #FROM phusion/passenger-ruby21:<VERSION>
-    #FROM phusion/passenger-nodejs:<VERSION>
-    #FROM phusion/passenger-customizable:<VERSION>
+    FROM eljojo/peter:<VERSION>
     
     # Set correct environment variables.
     ENV HOME /root
     
     # Use baseimage-docker's init process.
     CMD ["/sbin/my_init"]
-    
-    # If you're using the 'customizable' variant, you need to explicitly opt-in
-    # for features. Uncomment the features you want:
-    #
-    #   Build system and git.
-    #RUN /build/utilities.sh
-    #   Ruby support.
-    #RUN /build/ruby1.9.sh
-    #RUN /build/ruby2.0.sh
-    #RUN /build/ruby2.1.sh
-    #   Common development headers necessary for many Ruby gems,
-    #   e.g. libxml for Nokogiri.
-    #RUN /build/devheaders.sh
-    #   Python support.
-    #RUN /build/python.sh
-    #   Node.js and Meteor support.
-    #RUN /build/nodejs.sh
     
     # ...put your own build instructions here...
     
@@ -193,19 +135,18 @@ The image has an `app` user with UID 9999 and home directory `/home/app`. Your a
 
 Your application should be placed inside /home/app.
 
-<a name="nginx_passenger"></a>
-### Using Nginx and Passenger
+<a name="nginx"></a>
+### Using Nginx
 
-Before using Passenger, you should familiarise yourself with it by [reading its documentation](https://www.phusionpassenger.com).
-
-Nginx and Passenger are disabled by default. Enable them like so:
+Nginx is disabled by default. Enable it like so:
 
     RUN rm -f /etc/service/nginx/down
 
 <a name="adding_web_app"></a>
 #### Adding your web app to the image
 
-Passenger works like a `mod_ruby`, `mod_node`, etc. It changes Nginx into an application server and runs your app from Nginx. So to get your web app up and running, you just have to add a virtual host entry to Nginx which describes where you app is, and Passenger will take care of the rest.
+The default nginx website is disabled, so you have to add it to ``/etc/nginx/sites-enabled/your-app.conf``.
+Because we're not using Passenger, you have to [set up your ruby app as a daemon](#adding_additional_daemons) and configure nginx to use a reverse proxy.
 
 You can add a virtual host entry (`server` block) by placing a .conf file in the directory `/etc/nginx/sites-enabled`. For example:
 
@@ -214,22 +155,6 @@ You can add a virtual host entry (`server` block) by placing a .conf file in the
         listen 80;
         server_name www.webapp.com;
         root /home/app/webapp/public;
-        
-        # The following deploys your Ruby/Python/Node.js/Meteor app on Passenger.
-        
-        # Not familiar with Passenger, and used (G)Unicorn/Thin/Puma/pure Node before?
-        # Yes, this is all you need to deploy on Passenger! All the reverse proxying,
-        # socket setup, process management, etc are all taken care automatically for
-        # you! Learn more at https://www.phusionpassenger.com/.
-        passenger_enabled on;
-        passenger_user app;
-        
-        # If this is a Ruby app, specify a Ruby version:
-        passenger_ruby /usr/bin/ruby2.1;
-        # For Ruby 2.0
-        passenger_ruby /usr/bin/ruby2.0;
-        # For Ruby 1.9.3 (you can ignore the "1.9.1" suffix)
-        #passenger_ruby /usr/bin/ruby1.9.1;
     }
     
     # Dockerfile:
@@ -268,55 +193,22 @@ To preserve these variables, place a file in the directory `/etc/nginx/main.d`. 
     # Dockerfile:
     ADD postgres.env /etc/nginx/main.d/postgres.env
 
-By default, passenger-docker already contains a config file `/etc/nginx/main.d/default.conf` which preserves the `PATH` environment variable.
+By default, peter already contains a config file `/etc/nginx/main.d/default.conf` which preserves the `PATH` environment variable.
 
-<a name="redis"></a>
-### Using Redis
+<a name="adding_additional_daemons"></a>
+### Adding additional daemons
 
-**Redis is only available in the passenger-customizable and passenger-full images!**
-
-Install and enable Redis:
-
-    # Opt-in for Redis if you're using the 'customizable' image.
-    #RUN /build/redis.sh
-    
-    # Enable the Redis service.
-    RUN rm -f /etc/service/redis/down
-
-The configuration file is in /etc/redis/redis.conf. Modify it as you see fit, but make sure `daemonize no` is set.
-
-<a name="memcached"></a>
-### Using memcached
-
-**Memcached is only available in the passenger-customizable and passenger-full images!**
-
-Install and enable memcached:
-
-    # Opt-in for Memcached if you're using the 'customizable' image.
-    #RUN /build/memcached.sh
-
-    # Enable the memcached service.
-    RUN rm -f /etc/service/memcached/down
-
-The configuration file is in /etc/memcached.conf. Note that it does not follow the Debian/Ubuntu format, but our own, in order to make it work well with runit. The default contents are:
-
-    # These arguments are passed to the memcached daemon.
-    MEMCACHED_OPTS="-l 127.0.0.1"
-
-<a name="additional_daemons"></a>
-### Additional daemons
-
-You can add additional daemons to the image by creating runit entries. You only have to write a small shell script which runs your daemon, and runit will keep it up and running for you, restarting it when it crashes, etc.
+You can add additional daemons (e.g. your own app) to the image by creating runit entries. You only have to write a small shell script which runs your daemon, and runit will keep it up and running for you, restarting it when it crashes, etc.
 
 The shell script must be called `run`, must be executable, and is to be placed in the directory `/etc/service/<NAME>`.
 
-Here's an example showing you how to a memached server runit entry can be made.
+Here's an example showing you how a memached server runit entry can be made.
 
     ### In memcached.sh (make sure this file is chmod +x):
     #!/bin/sh
-    # `chpst` is part of running. `chpst -u memcache` runs the given command
-    # as the user `memcache`. If you omit this, the command will be run as root.
-    exec chpst -u memcache /usr/bin/memcached >>/var/log/memcached.log 2>&1
+    # `/sbin/setuser memcache` runs the given command as the user `memcache`.
+    # If you omit that part, the command will be run as root.
+    exec /sbin/setuser memcache /usr/bin/memcached >>/var/log/memcached.log 2>&1
 
     ### In Dockerfile:
     RUN mkdir /etc/service/memcached
@@ -324,24 +216,10 @@ Here's an example showing you how to a memached server runit entry can be made.
 
 Note that the shell script must run the daemon **without letting it daemonize/fork it**. Usually, daemons provide a command line flag or a config file option for that.
 
-**Tip**: If you're thinking about running your web app, consider deploying it on Passenger instead of on runit. Passenger relieves you from even having to write a shell script, and adds all sorts of useful production features like process scaling, introspection, etc. These are not available when you're only using runit.
-
-<a name="selecting_default_ruby"></a>
-### Selecting a default Ruby version
-
-The default Ruby (what the `/usr/bin/ruby` command executes) is the latest Ruby version that you've chosen to install. You can use `ruby-switch` to select a different version as default.
-
-    # Ruby 1.9.3 (you can ignore the "1.9.1" suffix)
-    RUN ruby-switch --set 1.9.1
-    # Ruby 2.0.0
-    RUN ruby-switch --set 2.0
-    # Ruby 2.1.0
-    RUN ruby-switch --set 2.1
-
 <a name="running_startup_scripts"></a>
 ### Running scripts during container startup
 
-passenger-docker uses the [baseimage-docker](http://phusion.github.io/baseimage-docker/) init system, `/sbin/my_init`. This init system runs the following scripts during startup, in the following order:
+peter uses the [baseimage-docker](http://phusion.github.io/baseimage-docker/) init system, `/sbin/my_init`. This init system runs the following scripts during startup, in the following order:
 
  * All executable scripts in `/etc/my_init.d`, if this directory exists. The scripts are run during in lexicographic order.
  * The script `/etc/rc.local`, if this file exists.
@@ -427,14 +305,6 @@ Now SSH into the container as follows:
 
     ssh -i /path-to/your_key root@<IP address>
 
-<a name="inspecting_web_app_status"></a>
-### Inspecting the status of your web app
-
-If you use Passenger to deploy your web app, run:
-
-    passenger-status
-    passenger-memory-stats
-
 <a name="logs"></a>
 ### Logs
 
@@ -451,8 +321,8 @@ If for whatever reason you want to build the image yourself instead of downloadi
 
 Clone this repository:
 
-    git clone https://github.com/phusion/passenger-docker.git
-    cd passenger-docker
+    git clone https://github.com/eljojo/peter.git
+    cd peter
 
 Start a virtual machine with Docker in it. You can use the Vagrantfile that we've already provided.
 
@@ -460,26 +330,15 @@ Start a virtual machine with Docker in it. You can use the Vagrantfile that we'v
     vagrant ssh
     cd /vagrant
 
-Build one of the images:
+Build the image:
 
-    make build_ruby19
-    make build_ruby20
-    make build_ruby21
-    make build_nodejs
-    make build_customizable
-    make build_full
+    make
 
 If you want to call the resulting image something else, pass the NAME variable, like this:
 
-    make build NAME=joe/passenger
+    make build NAME=joe/peter
 
-<a name="conclusion"></a>
-## Conclusion
+Big thanks to the [Phusion](http://www.phusion.nl/) people for creating passenger-docker and baseimage. :-)
 
- * Using passenger-docker? [Tweet about us](https://twitter.com/share) or [follow us on Twitter](https://twitter.com/phusion_nl).
- * Having problems? Please post a message at [the discussion forum](https://groups.google.com/d/forum/passenger-docker).
- * Looking for a minimal image containing only a correct base system? Take a look at [baseimage-docker](https://github.com/phusion/baseimage-docker).
+![Peter](https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png)
 
-[<img src="http://www.phusion.nl/assets/logo.png">](http://www.phusion.nl/)
-
-Please enjoy passenger-docker, a product by [Phusion](http://www.phusion.nl/). :-)
