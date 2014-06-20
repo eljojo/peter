@@ -8,7 +8,7 @@ set -x
 /build/utilities.sh
 
 /build/devheaders.sh
-/build/ruby2.1.sh
+/build/ruby.sh
 /build/nodejs.sh
 /build/nginx.sh
 
