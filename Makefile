@@ -13,6 +13,9 @@ build_all: build_customizable
 build_customizable:
 	docker build -t $(NAME):$(VERSION) --rm image
 
+build_dev:
+	docker build -t $(NAME):$(VERSION) image
+
 tag_latest:
 	docker tag $(NAME):$(VERSION) $(NAME):latest
 
