@@ -21,7 +21,7 @@ make install
 echo "gem: --no-ri --no-rdoc" > /home/app/.gemrc
 echo "compat.version=2.0" > /home/app/.jrubyrc
 
-ruby-install ruby
+ruby-install ruby -- --disable-install-doc
 chruby-exec ruby -- gem install bundler rake
 
 ruby-install jruby
