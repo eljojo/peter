@@ -26,6 +26,7 @@ setuser app echo "compat.version=2.0" > /home/app/.jrubyrc
 ruby-install ruby -- --disable-install-doc
 setuser app /usr/local/bin/chruby-exec ruby -- gem install bundler rake
 
-ruby-install jruby
+apt-get install -y openjdk-7-jre-headless
+ruby-install jruby --no-install-deps
 setuser app chruby-exec jruby -- gem install bundler rake
 
