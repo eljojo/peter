@@ -1,5 +1,5 @@
 FROM phusion/baseimage:0.9.10
-MAINTAINER Phusion <info@phusion.nl>
+MAINTAINER jojo [at] eljojo [dot] net
 
 ENV HOME /root
 RUN mkdir /build
