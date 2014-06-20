@@ -12,4 +12,5 @@ cp /build/config/nginx_main_d_default.conf /etc/nginx/main.d/default.conf
 mkdir /etc/service/nginx
 cp /build/runit/nginx /etc/service/nginx/run
 touch /etc/service/nginx/down
+rm /etc/nginx/sites-enabled/default
 
