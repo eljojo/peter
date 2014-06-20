@@ -13,9 +13,10 @@ Differences with passenger-docker:
 - Removed Ruby 1.9 and 2.0 (only 2.1 left)
 - Disabled nginx by default (easy to enable)
 - Disabled cron by default (easy to enable)
-- Removed redis
-- Removed memcached
-- Removed pups
+- Removed redis, memcached, pups
+- Also installing jruby
+
+To see all the changes, please read the [Changelog](https://github.com/eljojo/peter/blob/master/Changelog.md)
 
 ---------------------------------------
 
@@ -34,7 +35,6 @@ Differences with passenger-docker:
      * [Configuring Nginx](#configuring_nginx)
      * [Setting environment variables in Nginx](#nginx_env_vars)
    * [Adding additional daemons](#adding_additional_daemons)
-   * [Selecting a default Ruby version](#selecting_default_ruby)
    * [Running scripts during container startup](#running_startup_scripts)
  * [Administering the image's system](#administering)
    * [Logging into the container with SSH](#login)
