@@ -1,6 +1,6 @@
 # A Docker base image for Ruby (web) apps
 
-<img src="http://blog.phusion.nl/wp-content/uploads/2013/11/docker.png" width="233" height="196" alt="Docker"></center>
+![Peter](https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png) <img src="http://blog.phusion.nl/wp-content/uploads/2013/11/docker.png" width="233" height="196" alt="Docker"></center>
 
 Peter is a [Docker](http://www.docker.io) image meant to serve as a good base for **Ruby** web app images. This image is based on [Phusion's baseimage](https://github.com/phusion/baseimage-docker), and it's actually a modification of [Phusion's Passenger-docker Image](https://github.com/phusion/passenger-docker), but without passenger. It also has some modifications.
 
@@ -340,5 +340,4 @@ If you want to call the resulting image something else, pass the NAME variable, 
 
 Big thanks to the [Phusion](http://www.phusion.nl/) people for creating passenger-docker and baseimage. :-)
 
-![Peter](https://upload.wikimedia.org/wikipedia/en/c/c2/Peter_Griffin.png)
 
