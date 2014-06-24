@@ -1,4 +1,4 @@
-## 0.9.11
+## 0.9.11 (release date: 2014-06-24)
 
  * Using chruby and ruby-install
  * removed passenger-docker's ruby
