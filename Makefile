@@ -1,5 +1,5 @@
 NAME = eljojo/peter
-VERSION = 0.9.11
+VERSION = 0.9.12
 
 .PHONY: all build_all  \
 	tag_latest release
