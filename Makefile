@@ -11,10 +11,10 @@ build_all: build_customizable
 # Docker doesn't support sharing files between different Dockerfiles. -_-
 # So we copy things around.
 build_customizable:
-	docker build -t $(NAME):$(VERSION) --rm image
+	docker build -t $(NAME):$(VERSION) --rm .
 
 build_dev:
-	docker build -t $(NAME):$(VERSION) image
+	docker build -t $(NAME):$(VERSION) .
 
 tag_latest:
 	docker tag $(NAME):$(VERSION) $(NAME):latest
