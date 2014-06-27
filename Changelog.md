@@ -1,3 +1,7 @@
+## 0.9.12
+
+ * Base image updated to phusion/baseimage:0.9.11
+
 ## 0.9.11 (release date: 2014-06-24)
 
  * Using chruby and ruby-install
